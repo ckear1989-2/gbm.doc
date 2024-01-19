@@ -1,0 +1,9 @@
+
+# run code locally but don't include in git
+*.jpeg
+*.jpg
+*.pdf
+*.png
+inst/test.data
+inst/test.output
+temp.R
