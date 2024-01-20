@@ -1,5 +1,6 @@
 #' @import ggplot2
 #' @import data.table
+#' @export
 univariate <- function(a.dt, x, y, p, w) {
   act <- act_rs <- pred <- count <- weight <- xn <- pred_rs <- NULL
   if (is.null(a.dt)) strop("attempting to plot null data.table")
