@@ -8,6 +8,6 @@ Rscript -e "devtools::document()"
 Rscript -e "devtools::install()"
 # Rscript tests/create.test.data.R
 # Rscript temp.R
-# Rscript -e "testthat::test_file(\"tests/testthat/test_univariates.R\", package=\"gbm.doc\")"
+Rscript -e "testthat::test_file(\"tests/testthat/test_univariates.R\", package=\"gbm.doc\")"
 Rscript -e "testthat::test_file(\"tests/testthat/test_summary.R\", package=\"gbm.doc\")"
-# Rscript -e "devtools::test()"
+Rscript -e "devtools::test()"
