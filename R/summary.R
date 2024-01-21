@@ -7,6 +7,7 @@ plot_model_param <- function(model) {
     "train.fraction",
     "cv.folds",
     "n.trees",
+    "best.trees",
     "shrinkage",
     "interaction.depth",
     "family",
@@ -28,8 +29,9 @@ plot_model_param <- function(model) {
   }
   vals <- c(
     round(model$params$train_fraction, 2),
-    model$cv.folds,
-    model$n.trees,
+    model$cv_folds,
+    model$params$num_trees,
+    best.trees,
     round(model$params$shrinkage, 3),
     round(model$params$interaction_depth),
     model$distribution$name,
@@ -38,9 +40,10 @@ plot_model_param <- function(model) {
     round(cv.error, 4),
     round(model$oobag.improve[[best.trees]], 4)
   )
-  params.dt.0 <- data.frame(t(data.frame(parameter = params[1:5], value = vals[1:5])))
+  params.dt.0 <- data.frame(t(data.frame(parameter = params[1:6], value = vals[1:6])))
   p.obj.options <- list(
     fs = 10,
+    rows = rownames(params.dt.0),
     rowcs = c("red1", "red3"),
     bg_fill = "red1",
     bg_color = "black",
@@ -48,11 +51,7 @@ plot_model_param <- function(model) {
     bg_linewidth = 0
   )
   p.obj.0 <- pretty.gtable::pretty_gtable(params.dt.0, p.obj.options)
-  params.dt.1 <- data.frame(t(data.frame(parameter = params[6:10], value = vals[6:10])))
+  params.dt.1 <- data.frame(t(data.frame(parameter = params[7:11], value = vals[7:11])))
   p.obj.1 <- pretty.gtable::pretty_gtable(params.dt.1, p.obj.options)
-  lay <- rbind(
-    c(1, 3),
-    c(2, 3)
-  )
-  arrangeGrob(p.obj.0, p.obj.1, layout_matrix = lay)
+  arrangeGrob(p.obj.0, p.obj.1, nrow = 2)
 }
