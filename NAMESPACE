@@ -2,6 +2,7 @@
 
 export(partial.plot)
 export(plot_model_param)
+export(plot_model_perf)
 export(plot_model_univariates)
 export(univariate)
 import(data.table)

@@ -55,3 +55,55 @@ plot_model_param <- function(model) {
   p.obj.1 <- pretty.gtable::pretty_gtable(params.dt.1, p.obj.options)
   arrangeGrob(p.obj.0, p.obj.1, nrow = 2)
 }
+
+#' @importFrom gbm3 iteration_error
+#' @import ggplot2
+#' @export
+plot_model_perf <- function(model) {
+  trees <- cv_rs <- cv <- x1 <- y1 <- x2 <- y2 <- NULL
+  train.error <- model$train.error
+  if (model$cv_folds > 1) {
+    best.trees <- gbm.perf(model, plot.it = FALSE, method = "cv")
+    cv.error <- gbm3::iteration_error(model, "cv")
+    if (is.null(cv.error)) {
+      cv.error <- train.error
+    }
+  } else {
+    warning("plotting model perf with no cv.")
+    best.trees <- gbm.perf(model, plot.it = FALSE, method = "test")
+    cv.error <- train.error
+  }
+  p.data <- data.table(
+    train.a = model$train.error,
+    train.b = model$valid.error,
+    cv = cv.error
+  )
+  p.data[, trees := seq(p.data[, .N])]
+  if (model$cv_folds > 1) {
+    p.data[, cv_rs := rebase.y(c(p.data[, train.a], p.data[, train.b]), p.data[, cv])]
+  } else {
+    p.data[, cv_rs := 0]
+  }
+  sf <- 0.2
+  plot.obj <- ggplot2::ggplot(p.data)
+  plot.obj <- plot.obj + ggplot2::geom_line(ggplot2::aes(x = trees, y = train.a), color = "red", linewidth = 2)
+  plot.obj <- plot.obj + ggplot2::geom_line(ggplot2::aes(x = trees, y = train.b), color = "blue", linewidth = 2)
+  plot.obj <- plot.obj + ggplot2::geom_line(ggplot2::aes(x = trees, y = cv_rs), color = "green", linewidth = 2)
+  best.y <- min(p.data[, train.b])
+  best.x <- p.data[train.b == best.y, trees]
+  df <- data.frame(x1 = c(1, best.x), x2 = c(best.x, best.x), y1 = c(best.y, best.y), y2 = c(best.y, -Inf))
+  plot.obj <- plot.obj + ggplot2::geom_segment(ggplot2::aes(x = x1, y = y1, xend = x2, yend = y2), data = df, linetype = "dashed")
+  plot.obj <- plot.obj + ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 0.5),
+    plot.title = ggplot2::element_text(hjust = 0.5),
+    panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 2)
+  )
+  plot.obj <- plot.obj + ggplot2::ggtitle("mean deviance on train.a, train.b and cv")
+  # TODO handle error when cv isn't used
+  # cv.error is copy of train
+  plot.obj <- plot.obj + ggplot2::scale_y_continuous(
+    name = "train.a, train.b mean.deviance",
+    sec.axis = ggplot2::sec_axis(~ rebase.y(p.data[, cv], .), name = "cv mean.deviance")
+  )
+  plot.obj
+}
