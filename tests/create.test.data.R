@@ -25,7 +25,7 @@ interaction.depth <- 2
 cv.folds <- 3
 formula <- stats::as.formula(paste("y", paste(xvar, collapse = "+"), sep = "~offset(offset)+"))
 modelfile <- file.path("inst", "test.data", "model.rds")
-pdffile <- file.path("inst", "test.output", "model.pdf")
+pdffile <- file.path("../../", "inst", "test.output", "model.pdf")
 
 model <- gbm(
   formula = formula,
@@ -67,7 +67,7 @@ saveRDS(model, modelfile)
 # model with no cv
 cv.folds <- 1
 modelfile <- file.path("inst", "test.data", "model.no.cv.rds")
-pdffile <- file.path("inst", "test.output", "model.no.cv.pdf")
+pdffile <- file.path("../../", "inst", "test.output", "model.no.cv.pdf")
 a.dt[, y := mpg]
 train.dt <- a.dt[rvar < 0.7, ]
 setorder(train.dt, rvar)

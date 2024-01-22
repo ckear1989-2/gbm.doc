@@ -141,27 +141,31 @@ partial.plot <- function(model, x, a.dt, debug = FALSE) {
   plot.obj
 }
 
-#' @importFrom grid grid.rect gpar
+#' @importFrom grid rectGrob gpar
 #' @importFrom gridExtra grid.arrange
-grid.square <- quote({
-  grid.rect(x = 0.25, y = 0.25, width = 0.50, height = 0.50, gp = gpar(lwd = 5, col = "black", fill = NA))
-  grid.rect(x = 0.25, y = 0.75, width = 0.50, height = 0.50, gp = gpar(lwd = 5, col = "black", fill = NA))
-  grid.rect(x = 0.75, y = 0.25, width = 0.50, height = 0.50, gp = gpar(lwd = 5, col = "black", fill = NA))
-  grid.rect(x = 0.75, y = 0.75, width = 0.50, height = 0.50, gp = gpar(lwd = 5, col = "black", fill = NA))
-})
+grid.square <- function() {
+  rectGrob(x = 0.5, y = 0.5, width = 1, height = 1, gp = gpar(lwd = 5, col = "black", fill = NA))
+}
 
+#' @importFrom grid grobTree
 #' @importFrom gridExtra grid.arrange
+#' @importFrom ggplotify as.grob
 #' @export
 plot_model_univariates <- function(model) {
+  ro <- rep(list(1:5), length(model$uvar))
+  gs <- grid.square()
+  i <- 1
   for (x in model$uvar) {
-    grid.arrange(
+    p <- arrangeGrob(
       univariate(model$train.a.dt, x, model$yvar, model$pvar, model$wvar),
       univariate(model$train.b.dt, x, model$yvar, model$pvar, model$wvar),
       univariate(model$test.dt, x, model$yvar, model$pvar, model$wvar),
       partial.plot(model, x, model$train.dt),
+      gs,
       ncol = 2
     )
-    eval(grid.square)
+    suppressWarnings(ro[i] <- p) # number of items replacement warning GTFO
+    i <- i + 1
   }
-  NULL
+  ro
 }
